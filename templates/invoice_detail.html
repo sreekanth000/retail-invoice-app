@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-md print:shadow-none print:p-0 print:border-none print:bg-transparent">
+    {# This is the colorful header for screen viewing, hidden on print #}
+    <div class="text-center mb-8 pb-4 border-b border-gray-200 print:hidden">
+        <h1 class="text-4xl font-extrabold text-blue-700 mb-2">Rajarajeswari Stores</h1>
+        <p class="text-lg text-gray-600 mb-1">Brahmadevam</p>
+        <p class="text-md text-gray-500">Prop: Sudheer Kalangi</p>
+    </div>
+
+    {# Display for print - A simple header for the receipt matching the image #}
+    <div class="hidden print:block text-center mb-4 text-black font-mono leading-tight">
+        <h1 class="text-xl font-bold uppercase mb-1">Cash Receipt</h1>
+        <p class="text-xs">Address : 1234 Rajarajeswari Stores, Brahmadevam</p>
+        <p class="text-xs">Tel : 123-456-7890</p>
+        <div class="border-b border-dashed border-black my-2"></div>
+        <p class="text-xs flex justify-between">
+            <span>Date : {{ invoice.invoice_date.strftime('%d-%m-%Y') }}</span>
+            <span>{{ invoice.invoice_date.strftime('%H:%M') }}</span>
+        </p>
+        <div class="border-b border-dashed border-black my-2"></div>
+    </div>
+
+    {# Main invoice title for screen, hidden for print #}
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center print:hidden">Invoice #{{ invoice.invoice_id }} Details</h1>
+
+    {# Customer details, hidden on print for the simplified receipt #}
+    <div class="mb-6 pb-4 border-b print:hidden">
+        <p class="text-lg text-gray-700 mb-2"><strong>Customer Name:</strong> {{ invoice.customer_name }}</p>
+        <p class="text-lg text-gray-700 mb-2"><strong>Invoice Date:</strong> {{ invoice.invoice_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="text-lg text-gray-700"><strong>Grand Total:</strong> ₹{{ "%.2f"|format(invoice.grand_total) }}</p>
+    </div>
+
+    {# Items section - adjust layout for print #}
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4 print:hidden">Items</h2>
+    {% if invoice['items'] %}
+    <div class="overflow-x-auto rounded-lg shadow mb-4 print:shadow-none print:mb-0 print:overflow-visible print:bg-transparent">
+        <table class="min-w-full divide-y divide-gray-200 print:divide-none print:font-mono">
+            <thead class="bg-gray-50 print:hidden">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price (₹)</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (kgs)</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 print:divide-none print:text-black">
+                {% for item in invoice['items'] %}
+                <tr class="print:border-none print:leading-tight">
+                    {# Product Name - always visible, but takes up less space for print #}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 print:px-0 print:py-0 print:text-xs print:font-normal print:w-3/4 print:text-left print:block print:float-left">
+                        {{ item.product_name }}
+                    </td>
+                    {# Unit Price (₹) - visible on screen, hidden on print #}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 print:hidden">
+                        ₹{{ "%.2f"|format(item.unit_price) }}
+                    </td>
+                    {# Quantity (kgs) - visible on screen, hidden on print #}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 print:hidden">
+                        {{ "%.3f"|format(item.quantity_sold) }} kgs
+                    </td>
+                    {# Item Total (₹) - always visible, but takes up less space for print #}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 print:px-0 print:py-0 print:text-xs print:text-right print:w-1/4 print:block print:float-right">
+                        ₹{{ "%.2f"|format(item.item_total) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="border-b border-dashed border-black my-2 hidden print:block"></div>
+
+    {# Totals section for print matching the image #}
+    <div class="hidden print:block text-black font-mono text-xs mt-2">
+        <p class="flex justify-between font-bold text-sm mt-1"><span>Total</span> <span>₹{{ "%.2f"|format(invoice.grand_total) }}</span></p>
+        <div class="border-b border-dashed border-black my-2"></div>
+        <p class="text-center mt-2 text-base font-bold">THANK YOU</p>
+        {# Barcode removed as requested #}
+    </div>
+
+
+    <div class="mt-6 text-center print:hidden">
+        <a href="{{ url_for('invoices') }}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 transition-colors mr-4">Back to Invoices</a>
+        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">Print Invoice</button>
+    </div>
+</div>
+{% else %}
+<p class="text-gray-600 print:hidden">No items found for this invoice.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,190 @@
+/* retail_invoice_app/static/css/style.css */
+
+/* Custom CSS can go here if needed */
+/* Tailwind CSS classes are preferred for utility-first styling */
+
+/* Example: Basic custom styles for flash messages */
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+}
+
+.flash-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.flash-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+.flash-warning {
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffecb5;
+}
+
+.flash-info {
+    background-color: #cff4fc;
+    color: #055160;
+    border: 1px solid #b6effb;
+}
+
+/* Ensure body uses Inter font */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Print-specific styles for small receipt printers --- */
+@media print {
+    /* Set overall page size and margins for print */
+    @page {
+        size: 57mm auto; /* Width: 57mm, Height: Auto for continuous feed */
+        margin: 0.5mm; /* Even smaller margins */
+    }
+
+    /* Hide non-essential elements for a clean receipt */
+    nav,
+    footer,
+    /* Hide the regular page header (the colorful one from base.html) */
+    header.bg-gradient-to-r,
+    /* Hide specific non-print elements in invoice_detail.html */
+    .bg-white.p-8.rounded-lg.shadow-md > .text-center.mb-8.pb-4.border-b.border-gray-200, /* Hides main UI store header */
+    .mt-6.text-center.print\:hidden, /* Hides action buttons (Back, Print) */
+    .flash-message,
+    /* Hide customer details block on print */
+    .mb-6.pb-4.border-b.pb-4 {
+        display: none !important;
+    }
+
+
+    /* Show the simplified store header for print (from invoice_detail.html) */
+    .hidden.print\:block {
+        display: block !important;
+    }
+
+    /* Adjust main body and content area for receipt print */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: white !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact; /* For better color consistency */
+        font-family: 'monospace', 'Inter', sans-serif; /* Receipt printers often use monospace */
+        font-size: 5.5pt; /* EVEN SMALLER font for very compact output */
+        line-height: 1.0 !important; /* Extremely compact line spacing */
+        width: 57mm !important; /* Explicitly set body width for print */
+        max-width: 57mm !important; /* Ensure it doesn't expand */
+        min-width: 57mm !important; /* Ensure it doesn't shrink */
+        box-sizing: border-box !important; /* Include padding/border in width */
+    }
+
+    /* Ensure the main content container is visible and reset its padding/margin */
+    .container.mx-auto.p-6 {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important; /* Should now be 100% of 57mm */
+        max-width: 100% !important;
+        float: none !important;
+    }
+
+    /* Invoice container specific adjustments for print */
+    .bg-white.p-8.rounded-lg.shadow-md { /* This targets the main invoice box */
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important; /* Remove internal padding */
+        margin: 0 !important; /* Remove internal margins */
+        width: 100% !important; /* Should now be 100% of 57mm */
+        max-width: 100% !important;
+        float: none !important;
+        display: block !important; /* Ensure this block is displayed */
+        page-break-inside: avoid; /* Avoid breaking this main content block */
+    }
+
+    /* Headings and Paragraphs for print */
+    h1, h2 {
+        text-align: center !important;
+        margin-top: 0.1em !important; /* Even further reduced margin */
+        margin-bottom: 0.1em !important; /* Even further reduced margin */
+        font-size: 1.0em !important; /* Relative to body font-size */
+        font-weight: bold !important;
+        page-break-after: avoid; /* Avoid page break immediately after a heading */
+    }
+
+    p {
+        margin-bottom: 0.05em !important; /* Even smaller margin */
+        font-size: 0.9em !important; /* Relative to body font-size */
+        page-break-inside: avoid; /* Avoid breaking paragraphs */
+    }
+
+    /* Table adjustments for receipt */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 0.1em !important; /* Reduced margin */
+        page-break-inside: avoid; /* Try to keep table on one page */
+    }
+
+    table th, table td {
+        padding: 0 !important; /* No padding for table cells */
+        border: none !important;
+        white-space: normal !important; /* Allow text to wrap */
+        word-wrap: break-word; /* Break long words */
+        font-size: 0.8em !important; /* Relative to body font-size */
+        line-height: 1.0 !important; /* Extremely compact line height */
+    }
+
+    table thead {
+        display: none !important; /* Hide table headers for simple receipt */
+    }
+
+    table tbody tr {
+        display: flex !important; /* Use flexbox for two-column item layout */
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        margin-bottom: 0.1em !important; /* Very small spacing between items */
+        page-break-inside: avoid; /* Avoid breaking individual rows */
+    }
+
+    table tbody td:nth-child(1) { /* Product Name */
+        width: 75% !important; /* Product Name takes most width */
+        text-align: left !important;
+        padding-right: 1px !important; /* Very tiny gap */
+    }
+
+    table tbody td:nth-child(2) { /* Item Total */
+        width: 25% !important; /* Item Total takes remaining width */
+        text-align: right !important;
+        white-space: nowrap !important; /* Keep price on one line */
+    }
+
+    /* Hide other table columns that are not part of the 2-column print format */
+    table tbody td:nth-child(3), /* Quantity (kgs) */
+    table tbody td:nth-child(4) { /* Original Item Total */
+        display: none !important;
+    }
+
+    /* Total and Thank You sections */
+    .hidden.print\:block > p.flex.justify-between,
+    .hidden.print\:block > p.text-center {
+        margin-top: 0.1em !important; /* Reduced margin */
+        margin-bottom: 0.1em !important;
+        page-break-inside: avoid; /* Avoid breaking these final paragraphs */
+    }
+    .hidden.print\:block > p.flex.justify-between span {
+        font-size: 1.0em !important; /* Total line slightly larger */
+    }
+
+    /* Ensure everything prints in black and white */
+    * {
+        color: black !important;
+        background-color: white !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        border-color: black !important; /* Ensure dashed borders print black */
+    }
+}

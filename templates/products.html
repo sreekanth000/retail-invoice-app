@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-md mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Products</h1>
+
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Product</h2>
+    <form method="POST" action="{{ url_for('products') }}" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label for="product_name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                <input type="text" id="product_name" name="product_name" required
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="quantity_available" class="block text-sm font-medium text-gray-700">Quantity Available (kgs)</label>
+                <input type="number" id="quantity_available" name="quantity_available" required min="0" step="0.001"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="unit_price" class="block text-sm font-medium text-gray-700">Unit Price (₹)</label>
+                <input type="number" id="unit_price" name="unit_price" required step="0.01" min="0.01"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <button type="submit"
+                class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            Add Product
+        </button>
+    </form>
+</div>
+
+<div class="bg-white p-8 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold text-gray-700">All Products</h2>
+        {# Product Search Form - moved here #}
+        <form method="GET" action="{{ url_for('products') }}" class="flex items-center space-x-2 w-1/3">
+            <input type="text" id="search_query" name="search_query" placeholder="Search products..."
+                   value="{{ search_query if search_query else '' }}"
+                   class="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <button type="submit"
+                    class="p-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-sm">
+                Search
+            </button>
+            {% if search_query %}
+            <a href="{{ url_for('products') }}" class="p-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 transition-colors text-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if products %}
+    <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity Available (kgs)</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price (₹)</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th> {# NEW COLUMN #}
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for product in products %}
+                <tr class="{% if product.is_active == 0 %}bg-gray-50 text-gray-500{% endif %}"> {# Styling for inactive products #}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.product_id }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.product_name|title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ "%.3f"|format(product.quantity_available) }} kgs</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">₹{{ "%.2f"|format(product.unit_price) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ product.last_updated.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        {% if product.is_active == 1 %}Active{% else %}Inactive{% endif %} {# Display Status #}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="{{ url_for('edit_product', product_id=product.product_id) }}" class="text-indigo-600 hover:text-indigo-900 font-medium mr-3">Edit</a>
+                        {% if product.is_active == 1 %}
+                        <form action="{{ url_for('deactivate_product', product_id=product.product_id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to deactivate this product? It will no longer be available for sale.');">
+                            <button type="submit" class="text-orange-600 hover:text-orange-900 font-medium">Deactivate</button>
+                        </form>
+                        {% else %}
+                        <form action="{{ url_for('activate_product', product_id=product.product_id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to activate this product? It will be available for sale again.');">
+                            <button type="submit" class="text-green-600 hover:text-green-900 font-medium">Activate</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-600">No products found. Add new products or adjust your search query.</p>
+    {% endif %}
+</div>
+{% endblock %}

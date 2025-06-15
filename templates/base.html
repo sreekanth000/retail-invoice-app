@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajarajeswari Stores - {{ title }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <nav class="bg-blue-600 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-white text-2xl font-bold rounded-lg px-3 py-1 hover:bg-blue-700 transition-colors">Rajarajeswari Stores</a>
+            <div class="space-x-4">
+                <a href="{{ url_for('products') }}" class="text-white hover:text-blue-200 text-lg px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">Products</a>
+                <a href="{{ url_for('create_invoice') }}" class="text-white hover:text-blue-200 text-lg px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">Create Invoice</a>
+                <a href="{{ url_for('invoices') }}" class="text-white hover:text-blue-200 text-lg px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">View Invoices</a>
+            </div>
+        </div>
+    </nav>
+
+    {# Store details displayed on all pages in a colorful format #}
+    <header class="bg-gradient-to-r from-purple-600 to-pink-600 py-6 shadow-lg text-white">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl font-extrabold mb-1 tracking-wide">Rajarajeswari Stores</h1>
+            <p class="text-xl font-medium mb-1 opacity-90">Brahmadevam</p>
+            <p class="text-lg opacity-80">Prop: Sudheer Kalangi</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 flex-grow">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="my-4">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }} mb-2">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 mt-8">
+        <div class="container mx-auto text-center">
+            &copy; {{ now().year }} Rajarajeswari Stores. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-md text-center">
+    <h1 class="text-4xl font-bold text-gray-800 mb-6">Welcome to Rajarajeswari Stores</h1>
+    <p class="text-lg text-gray-600 mb-8">Manage your products and create sales invoices with ease.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a href="{{ url_for('products') }}" class="block p-6 bg-blue-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 class="text-xl font-semibold text-blue-800 mb-2">Manage Products</h2>
+            <p class="text-gray-700">Add new products or view existing inventory.</p>
+        </a>
+        <a href="{{ url_for('create_invoice') }}" class="block p-6 bg-green-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 class="text-xl font-semibold text-green-800 mb-2">Create Invoice</h2>
+            <p class="text-gray-700">Generate new sales invoices for customers.</p>
+        </a>
+        <a href="{{ url_for('invoices') }}" class="block p-6 bg-purple-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 class="text-xl font-semibold text-purple-800 mb-2">View Invoices</h2>
+            <p class="text-gray-700">Browse and review past sales transactions.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
